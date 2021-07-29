@@ -13,7 +13,9 @@ export const LOGIN_FAILURE = "LOGIN_FAILURE"
 
 const initialState = {
     usuario: "",
-    contrasenia: ""
+    contrasenia: "",
+    login_success: false,
+    login_failure: false
 }
 
 const reducer = (state=initialState, action) => {
@@ -23,6 +25,20 @@ const reducer = (state=initialState, action) => {
                 ...state,
                 usuario: action.payload.user,
                 contrasenia: action.payload.password
+            }
+        }
+        case LOGIN_SUCCESS: {
+            return {
+                ...state,
+                login_success: true,
+                login_failure: false
+            }
+        }
+        case LOGIN_FAILURE:{
+            return {
+                ...state,
+                login_success: false,
+                login_failure:true
             }
         }
         default:
@@ -50,7 +66,12 @@ export const setUserPassword = (user) => ({
 })
 export const setUserLoginSuccess = () => (
     {
-        type: 
+        type: LOGIN_SUCCESS
+    }
+)
+export const setUserLoginFailure = () => (
+    {
+        type: LOGIN_FAILURE
     }
 )
 
@@ -61,7 +82,7 @@ export function validateUser (user){
         const response = await API.validateUser(user)
         if (response == true){
             dispatch(setUserPassword(user))
-
+            dispatch()
         }
     } 
 }
