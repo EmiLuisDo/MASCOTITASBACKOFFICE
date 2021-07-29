@@ -57,7 +57,9 @@ export const getUsuario = (state) => {
 export const getContrasenia = (state) => {
     return state.contrasenia
 }
-
+export const getLoginSuccess = (state)=>{
+    return state.login_success
+}
 //action creators 
 
 export const setUserPassword = (user) => ({
@@ -81,8 +83,10 @@ export function validateUser (user){
     return async function validateUserThunk (dispatch){
         const response = await API.validateUser(user)
         if (response == true){
+            dispatch(setUserLoginSuccess())
             dispatch(setUserPassword(user))
-            dispatch()
+        }else{
+            dispatch(setUserLoginFailure())
         }
     } 
 }

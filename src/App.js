@@ -1,21 +1,18 @@
 import Login from "./Components/login"
 import { useSelector } from "react-redux";
-import { getUsuario, getContrasenia } from "./Redux/Store"
+import { getUsuario, getContrasenia, getLoginSuccess } from "./Redux/Store"
 
 
 function App() {
 
   const user = useSelector(getUsuario)
   const contrasenia = useSelector(getContrasenia)
-  console.log("user")
-  console.log(user)
-  console.log("contrasenia")
-  console.log(contrasenia)
+  const login_success = useSelector(getLoginSuccess)
 
 
   return (
     <div className="App">
-      <Login></Login>
+      { !login_success ? <Login/> : null}
     </div>
   );
 }
