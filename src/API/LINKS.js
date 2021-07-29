@@ -1,0 +1,1 @@
+export const VALIDATE_USER = "https://localhost:5001/api/refugios/validate"
