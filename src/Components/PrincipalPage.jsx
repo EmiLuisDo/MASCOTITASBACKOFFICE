@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {Button, Col, Row, Container} from 'react-bootstrap/';
+import {Button, Col, Row, Container, Navbar} from 'react-bootstrap/';
 import AltaMascotaModal from "./AltaMascotaModal"
 import { useDispatch } from 'react-redux'
 import { useSelector } from "react-redux";
 import { tryGetTiposMascotas, getTiposMascotas, tryGetMascotasByRefugio, getUsuario, getMascotas} from "../Redux/Store"
 import TarjetaMascota from "./TarjetaMascota"
-
+import PrincipalHeader from "./PrincipalHeader"
 
 const PrincipalPage = (props) => {
 
@@ -35,6 +35,7 @@ const PrincipalPage = (props) => {
     }
     return (
         <div>
+            <PrincipalHeader useremail={correo}></PrincipalHeader>
             <Container>
             <Row xs={1} md={4} className="g-4">
             {Array.from({ length: mascotas.length }).map((_, idx) => (
@@ -46,8 +47,11 @@ const PrincipalPage = (props) => {
             </Row>
 
             {showModal && <AltaMascotaModal data = {data} showModal={showModal} setShowModal={setShowModal}/>}
+            <Navbar expand="lg" variant="dark" bg="light">
+                <Button variant="success" onClick = {() => handleClick()} >Agregar Mascota</Button>{' '}
+            </Navbar>
             </Container>
-            <Button variant="success" onClick = {() => handleClick()} >Agregar Mascota</Button>{' '}
+
         </div>
     )
 }   
