@@ -3,19 +3,34 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from "redux-thunk"
 import logger from "redux-logger"
 import * as API from "../API/APIService"
+import * as CLOUDINARY from "../API/Cloudinary"
 
 //constantes tipos acciones
 export const USER_SETTED = "USER_SETTED"
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS"
 export const LOGIN_FAILURE = "LOGIN_FAILURE"
-
-
+export const GETTING_TIPOS_MASCOTAS = "GETTING_TIPOS_MASCOTAS"
+export const GETTING_TIPOS_MASCOTAS_SUCCESS = "GETTING_TIPOS_MASCOTAS_SUCCESS"
+export const GETTING_TIPOS_MASCOTAS_FAILURE = "GETTING_TIPOS_MASCOTAS_FAILURE"
+export const SET_TIPOS_MASCOTAS = "SET_TIPOS_MASCOTAS"
+export const SET_UPPING_PHOTO = "SET_UPPING_PHOTO"
+export const SET_CREATING_MASC = "SET_CREATING_MASC"
+export const SET_CREATING_MASC_SUCCESS = "SET_CREATING_MASC_SUCCESS"
+export const SET_CREATING_MASC_FAILURE = "SET_CREATING_MASC_FAILURE"
 
 const initialState = {
     usuario: "",
     contrasenia: "",
     login_success: false,
-    login_failure: false
+    login_failure: false,
+    tiposMascotas: [], 
+    gettingTiposMascotas: false,
+    gettingTiposMascotasSuccess: false,
+    gettingTiposMascotasFailure: false,
+    uppingPhoto: false,
+    creatingMasc : false,
+    creatingMaskSuccess : false,
+    creatingMaskFailure : false
 }
 
 const reducer = (state=initialState, action) => {
@@ -38,7 +53,61 @@ const reducer = (state=initialState, action) => {
             return {
                 ...state,
                 login_success: false,
-                login_failure:true
+                login_failure: true
+            }
+        }
+
+
+        case GETTING_TIPOS_MASCOTAS:{
+            return {
+                ...state,
+                gettingTiposMascotas: true
+            }
+        }
+        case GETTING_TIPOS_MASCOTAS_SUCCESS:{
+            return {
+                ...state,
+                gettingTiposMascotasSuccess:true,
+                gettingTiposMascotas:false
+            }
+        }
+        case GETTING_TIPOS_MASCOTAS_FAILURE:{
+            return {
+                ...state,
+                gettingTiposMascotasSuccess:false,
+                gettingTiposMascotas:false
+            }
+        }
+        case SET_TIPOS_MASCOTAS:{
+            return {
+                ...state,
+                tiposMascotas: action.payload
+            }
+        }
+        case SET_UPPING_PHOTO:{
+            return {
+                ...state,
+                uppingPhoto: action.payload
+            }
+        }
+        case SET_CREATING_MASC:{
+            return {
+                ...state,
+                creatingMasc : true,
+            }
+        }
+        case SET_CREATING_MASC_SUCCESS: {
+            return {
+                ...state,
+                creatingMasc: false,
+                creatingMaskSuccess : true,
+            }
+        }
+        case SET_CREATING_MASC_FAILURE: {
+            return {
+                ...state,
+                creatingMasc: false,
+                creatingMaskFailure: true
             }
         }
         default:
@@ -60,6 +129,9 @@ export const getContrasenia = (state) => {
 export const getLoginSuccess = (state)=>{
     return state.login_success
 }
+export const getTiposMascotas = (state) => {
+    return state.tiposMascotas
+}
 //action creators 
 
 export const setUserPassword = (user) => ({
@@ -76,17 +148,117 @@ export const setUserLoginFailure = () => (
         type: LOGIN_FAILURE
     }
 )
+export const setGettingTiposMascotas = () => (
+    {
+        type: GETTING_TIPOS_MASCOTAS
+    }
+)
+export const setGettingTiposMascotasSuccess = () => (
+    {
+        type: GETTING_TIPOS_MASCOTAS_SUCCESS
+    }
+)
+export const setGettingTiposMascotasFailure = () => (
+    {
+        type : GETTING_TIPOS_MASCOTAS_FAILURE
+    }
+)
+export const setTiposMascotas = (tiposMascotas) => (
+    {
+        type: SET_TIPOS_MASCOTAS,
+        payload: tiposMascotas,
+    }
+)
+export const setUppingPhoto = (upping) => (
+    {
+        type: SET_UPPING_PHOTO,
+        payload: upping
+    }
+    )
+export const setCreatingMasc = ()=>(
+    {
+        type: SET_CREATING_MASC
+    }
+    )
+export const setCreatingMascSuccess = () => (
+    {
+        type: SET_CREATING_MASC_SUCCESS
+    }
+)
+export const setCreatingMascFailure = () => (
+    {
+        type: SET_CREATING_MASC_FAILURE
+    }
+)
+
 
 
 //thunk
 export function validateUser (user){
     return async function validateUserThunk (dispatch){
         const response = await API.validateUser(user)
-        if (response == true){
+        if (response === true){
             dispatch(setUserLoginSuccess())
             dispatch(setUserPassword(user))
         }else{
             dispatch(setUserLoginFailure())
         }
     } 
+}
+
+export function tryGetTiposMascotas (){
+    return async function tryGetTiposMascotasThunk (dispatch){
+        dispatch (setGettingTiposMascotas())
+        const response = await API.getTiposMascotas ()
+        if(response === []){
+            dispatch(setGettingTiposMascotasFailure())
+        }
+        else{
+            dispatch(setGettingTiposMascotasSuccess())
+            dispatch(setTiposMascotas(response))
+        }
+    }
+}
+
+export function upMascota (formdata, useremail) {
+    return async function upMascotaThunk (dispatch){
+        dispatch (setUppingPhoto(true))
+
+
+        const fdata = new FormData()
+        fdata.append("file", formdata.FotoMascota[0])
+        fdata.append("upload_preset", "mascotitas")
+        fdata.append("cloud_name", "dxneookr1")
+        console.log("FDATA EN FORM ")
+        console.log(fdata)
+        fetch("https://api.cloudinary.com/v1_1/dxneookr1/image/upload",
+          {method: "post",
+          body:fdata
+        })
+        .then(resp => resp.json())
+        .then(respjson => {
+
+            const data = {
+                anionacimiento: formdata.AnioNacimiento,
+                descripcion: formdata.Descripcion,
+                urlfoto: respjson.url,
+                idtipomascota: formdata.IdTipoMascota,
+                Nombre: formdata.Nombre,
+                CorreoRefugio: useremail
+            }
+            dispatch(setCreatingMasc())
+            API.addMascota(data)
+            .then(resp =>{
+                console.log(resp)
+                if(resp === true){
+                    dispatch(setCreatingMascSuccess())
+                }else{
+                    dispatch(setCreatingMascFailure())
+                }
+            })
+        })
+        .catch(err => console.log(err))
+        .finally(()=>{ dispatch (setUppingPhoto(false)) })
+        
+    }
 }
