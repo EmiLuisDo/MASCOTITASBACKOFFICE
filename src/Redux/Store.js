@@ -17,6 +17,10 @@ export const SET_UPPING_PHOTO = "SET_UPPING_PHOTO"
 export const SET_CREATING_MASC = "SET_CREATING_MASC"
 export const SET_CREATING_MASC_SUCCESS = "SET_CREATING_MASC_SUCCESS"
 export const SET_CREATING_MASC_FAILURE = "SET_CREATING_MASC_FAILURE"
+export const SET_FETCHING_MASCOTAS = "SET_FETCHING_MASCOTAS"
+export const SET_FETCHING_MASCOTAS_SUCCESS = "SET_FETCHING_MASCOTAS_SUCCESS"
+export const SET_FETCHING_MASCOTAS_FAILURE = "SET_FETCHING_MASCOTAS_FAILURE"
+export const SET_MASCOTAS = "SET_MASCOTAS"
 
 const initialState = {
     usuario: "",
@@ -30,7 +34,11 @@ const initialState = {
     uppingPhoto: false,
     creatingMasc : false,
     creatingMaskSuccess : false,
-    creatingMaskFailure : false
+    creatingMaskFailure : false,
+    fetchingMascotas: false,
+    fetchingMascotasFailure: false,
+    fetchingMascotasSuccess: false,
+    mascotas: []
 }
 
 const reducer = (state=initialState, action) => {
@@ -110,6 +118,32 @@ const reducer = (state=initialState, action) => {
                 creatingMaskFailure: true
             }
         }
+        case SET_FETCHING_MASCOTAS: {
+            return {
+                ...state,
+                fetchingMascotas:true
+            }
+        }
+        case SET_FETCHING_MASCOTAS_SUCCESS: {
+            return {
+                ...state,
+                fetchingMascotasSuccess:true,
+                fetchingMascotas: false
+            }
+        }
+        case SET_FETCHING_MASCOTAS_FAILURE: {
+            return {
+                ...state,
+                fetchingMascotasFailure:true,
+                fetchingMascotas:false 
+            }
+        }
+        case SET_MASCOTAS: {
+            return {
+                ...state,
+                mascotas: action.payload
+            }
+        }
         default:
             return state
     }
@@ -131,6 +165,9 @@ export const getLoginSuccess = (state)=>{
 }
 export const getTiposMascotas = (state) => {
     return state.tiposMascotas
+}
+export const getMascotas = (state) => {
+    return state.mascotas
 }
 //action creators 
 
@@ -188,6 +225,27 @@ export const setCreatingMascSuccess = () => (
 export const setCreatingMascFailure = () => (
     {
         type: SET_CREATING_MASC_FAILURE
+    }
+)
+export const setFetchingMascotas = () => (
+    {
+        type: SET_FETCHING_MASCOTAS
+    }
+)
+export const setFetchingMascotasFailure = () => (
+    {
+        type: SET_FETCHING_MASCOTAS_FAILURE
+    }
+)
+export const setFetchingMascotasSuccess = () => (
+    {
+        type: SET_FETCHING_MASCOTAS_SUCCESS
+    }
+)
+export const setMascotas = (mascotas) => (
+    {
+        type: SET_MASCOTAS,
+        payload: mascotas
     }
 )
 
@@ -260,5 +318,23 @@ export function upMascota (formdata, useremail) {
         .catch(err => console.log(err))
         .finally(()=>{ dispatch (setUppingPhoto(false)) })
         
+    }
+}
+
+export function tryGetMascotasByRefugio(correo){
+    return async function tryGetMascotasByRefugioThunk(dispatch){
+        dispatch (setFetchingMascotas())
+        console.log("CORREO EN THUNK")
+        console.log(correo)
+        const response = await API.getMascotasByRefugio (correo)
+
+        if(response === []){
+            dispatch( setFetchingMascotasSuccess ())
+            dispatch( setMascotas(response) )
+        }
+        else {
+            dispatch (setFetchingMascotasFailure ())
+            dispatch( setMascotas(response) )
+        }
     }
 }

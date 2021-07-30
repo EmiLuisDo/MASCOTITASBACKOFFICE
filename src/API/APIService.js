@@ -61,3 +61,19 @@ export async function addMascota (data) {
     })
     return respuesta
 }
+
+export async function getMascotasByRefugio (correorefugio) {
+  let respuesta = null
+    await axios({
+      method: 'get',
+      url: LINKS.GET_MASCOTAS_BY_REFUGIO(correorefugio)
+    })
+    .then(function (response) {
+        respuesta = response.data
+    })
+    .catch(function (error) {
+        if (error.response.status === 418) 
+          respuesta = []
+    })
+    return respuesta
+}
