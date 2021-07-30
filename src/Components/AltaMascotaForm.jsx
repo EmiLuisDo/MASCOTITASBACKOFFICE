@@ -17,7 +17,6 @@ function AltaMascotaForm(props) {
   const {register, handleSubmit} = useForm()
 
   const onSubmit = (data) => {
-
     dispatch(upMascota(data, useremail))
     setShowModal(false)
   }

@@ -310,6 +310,8 @@ export function upMascota (formdata, useremail) {
                 console.log(resp)
                 if(resp === true){
                     dispatch(setCreatingMascSuccess())
+                    dispatch(tryGetMascotasByRefugio(useremail))
+
                 }else{
                     dispatch(setCreatingMascFailure())
                 }
